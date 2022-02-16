@@ -7,69 +7,68 @@ function createElement(tag, className) {
 
   return $tag;
 }
+const iterator = (array) => {
+  let index = 0;
 
-class Player {
+  return () => {
+    const value = array[index];
 
-  constructor(playerCount = 4){
-    this.playerCount = playerCount;
-    this.playerId = null;
-    this.playerCart = null;
-    this.activePlayer = null;
-    this.player = null;
-    this.activePlayer = null;
+    if (index < array.length) {
+      index++;
+    }
+
+    return value;
+  };
+}
+
+class Players {
+
+  constructor(playersCount = 4){
+    this.playersCount = playersCount;
+    this.activePlayer = 0;
+    this.players = [];
+    
   }
 
   
-  updetePoints(cartValue){
-    let sum = 0;
-
-    for(let i = 0; i<this.playerCart; i++){
-      sum+=cartValue;
+  updetePoints(){
+    const activePlayer = this.getActivePlayer();
+    let sum =0;
+    for(let i = 0; i < activePlayer.hand.length; i++){ 
       
-      if(sum > 21){
-        console.log("GameOver");
-      }
-      else {
-        
-        return sum;
-        
-      }
+      sum+=activePlayer.hand[i].weight;
     }
-    console.log(sum);
-  }
-  createPlayer(playerCart){
     
-    let players = [];
+    
+   
+    activePlayer.points = sum;
+    //console.log(activePlayer);
+  }
 
-    for(let i = 0; i < this.playerCount; i++){
-      this.player = {playerId: this.playerId++, playerCart: playerCart}
-      players.push(this.player);
-     
+  nextPlayer(){
+   
+    return this.activePlayer++;
+  }
+
+  setCard(card){
+    const activePlayer = this.getActivePlayer();
+    activePlayer.hand.push(card);
+  }
+
+  getActivePlayer(){
+    return this.players.find(p => p.id === this.activePlayer +1)
+  }
+  createPlayers(){
+    for(let i = 0; i < this.playersCount; i++){
+      this.players = [
+        ...this.players,
+        {id: i+1, hand: [], points: 0}
+      ];
     }
-    console.log(players);
   }
 }
 
-class RenderUi {
-  constructor() {
-    this.player = player;
-  }
 
-  playerRender() {
-    let rootPlayer = document.querySelector("rootPlayers");
-
-    let  players = createElement("div", "players");
-    let  playersUl = createElement("ul");
-    let  player = createElement("li", 'player');
-
-    players.appendChild(playersUl);
-    playersUl.appendChild(player);
-    rootPlayer.appendChild(players);
-
-    
-
-  }
-}
 
 class Deck {
   constructor(){
@@ -78,7 +77,7 @@ class Deck {
     this.deck = [];
   }
   
-  shuggle(){
+  shuffle(){
     let j, temp;
 
     for(let i = this.deck.length - 1 ; i> 0 ; i--){
@@ -125,20 +124,106 @@ class Deck {
   }
 }
 
+class Game {
+  constructor(){
+    this.deck = new Deck();
+    this.playersInstance = new Players(4);
+    
+    
+  }
+
+  // playerRender() {
+  //   //const activePlayer = this.playersInstance.getActivePlayer();
+  //   let players = this.playersInstance.players;
+
+  //   const rootPlayer = document.getElementById("rootPlayers");
+       
+  
+  //   let  playersDiv = createElement("div", "players");
+  //   let  playersUl = createElement("ul");
+  //   let  playerLi = createElement("li", 'player');
+
+      
+  //   players.forEach((player)=> {
+  //     player.innerHTML = `<p>${player.id}<p>`;
+  //   })
+    
+  //   playerLi.appendChild(players);
+  //   playersUl.appendChild(playerLi);
+  //   playersDiv.appendChild(playersUl);
+  //   rootPlayer.appendChild(playersDiv);
+      
+    
+  // }
+  
+
+  renderCard(item){
+    let player = createElement("div", "player");
+    player.id = item;
+    
+    playerTitle = createElement("p" ,"playerTitle");
+    pleyerTitle.textContent = `player ${player.id}`;
+    
+    player.appendChild(playerTitle);
+    
+  }
+
+  startGame(){
+    
+    this.deck.createDeck();
+    this.deck.shuffle();
+    this.playersInstance.createPlayers(this.deck);
+    this.playersInstance.setCard(this.deck.getCart());
+    console.log(this.playersInstance.players);
+   
+  }
+
+  gameMore(){
+    const activePlayer = this.playersInstance.getActivePlayer();
+
+    this.playersInstance.setCard(this.deck.getCart());
+    this.playersInstance.updetePoints();
+    //console.log(this.playersInstance.length);
+    
+    
+      if(activePlayer.points > 21){
+       
+        this.playersInstance.nextPlayer();
+        
+  
+      }
+    
+  
+    //console.log(this.playersInstance.getActivePlayer());
+  }
+
+  gameStay(){
+    this.playersInstance.nextPlayer();
+  }
+}
 
 
 
 
 
-const deck = new Deck();
-deck.createDeck();
-console.log(deck);
+
+const game = new Game();
+
+game.startGame();
+game.gameMore();
+
+game.gameStay();
+game.gameMore();
+game.gameStay();
+game.gameMore();
 
 
-const player = new Player();
-player.createPlayer(deck.getCart());
-player.updetePoints(deck.getWeight());
+
+game.playerRender();
 
 
-const renderPlayer = new RenderUi();
-renderPlayer.playerRender();
+
+
+
+
+

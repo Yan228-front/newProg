@@ -19,85 +19,69 @@ const iterator = (array) => {
 
     return value;
   };
-}
+};
 
 class Players {
-
-  constructor(playersCount = 4){
+  constructor(playersCount = 4) {
     this.playersCount = playersCount;
     this.activePlayer = 0;
     this.players = [];
-    
   }
 
-  
-  updetePoints(){
+  updetePoints() {
     const activePlayer = this.getActivePlayer();
-    let sum =0;
-    for(let i = 0; i < activePlayer.hand.length; i++){ 
-      
-      sum+=activePlayer.hand[i].weight;
+    let sum = 0;
+    for (let i = 0; i < activePlayer.hand.length; i++) {
+      sum += activePlayer.hand[i].weight;
     }
-    
-    
-   
+
     activePlayer.points = sum;
     //console.log(activePlayer);
   }
 
-  nextPlayer(){
-   
+  nextPlayer() {
     return this.activePlayer++;
   }
 
-  setCard(card){
+  setCard(card) {
     const activePlayer = this.getActivePlayer();
     activePlayer.hand.push(card);
   }
 
-  getActivePlayer(){
-    return this.players.find(p => p.id === this.activePlayer +1)
+  getActivePlayer() {
+    return this.players.find((p) => p.id === this.activePlayer + 1);
   }
-  createPlayers(){
-    for(let i = 0; i < this.playersCount; i++){
-      this.players = [
-        ...this.players,
-        {id: i+1, hand: [], points: 0}
-      ];
+  createPlayers() {
+    for (let i = 0; i < this.playersCount; i++) {
+      this.players = [...this.players, { id: i + 1, hand: [], points: 0 }];
     }
   }
 }
 
-
-
 class Deck {
-  constructor(){
-    this.value = [2,3,4,5,6,7,8,9,10,"J","Q","K","A"];
+  constructor() {
+    this.value = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"];
     this.suits = ["Diamonds", "Hearts", "Clubs", "Spades"];
     this.deck = [];
   }
-  
-  shuffle(){
+
+  shuffle() {
     let j, temp;
 
-    for(let i = this.deck.length - 1 ; i> 0 ; i--){
-      
-      j= Math.floor(Math.random() * (i + 1));
+    for (let i = this.deck.length - 1; i > 0; i--) {
+      j = Math.floor(Math.random() * (i + 1));
       temp = this.deck[j];
       this.deck[j] = this.deck[i];
-      console.log(this.deck[i] = temp);
+      console.log((this.deck[i] = temp));
     }
-    
   }
 
-  getCart(){
-    return this.deck.pop()
+  getCart() {
+    return this.deck.pop();
   }
 
-
-
-  getWeight(value){
-    switch (value){
+  getWeight(value) {
+    switch (value) {
       case "J":
       case "Q":
       case "K":
@@ -107,29 +91,27 @@ class Deck {
       default:
         return value;
     }
-    
   }
-  createDeck(){
-    for(let i = 0; i<this.suits.length; i++){
-      for(let j = 0; j<this.value.length; j++){
-        
+  createDeck() {
+    for (let i = 0; i < this.suits.length; i++) {
+      for (let j = 0; j < this.value.length; j++) {
         this.deck = [
           ...this.deck,
-          {suits: this.suits[i],
-          value: this.value[j],
-          weight: this.getWeight(this.value[j])}
-        ] 
+          {
+            suits: this.suits[i],
+            value: this.value[j],
+            weight: this.getWeight(this.value[j]),
+          },
+        ];
       }
     }
   }
 }
 
 class Game {
-  constructor(){
+  constructor() {
     this.deck = new Deck();
     this.playersInstance = new Players(4);
-    
-    
   }
 
   // playerRender() {
@@ -137,75 +119,80 @@ class Game {
   //   let players = this.playersInstance.players;
 
   //   const rootPlayer = document.getElementById("rootPlayers");
-       
-  
+
   //   let  playersDiv = createElement("div", "players");
   //   let  playersUl = createElement("ul");
   //   let  playerLi = createElement("li", 'player');
 
-      
   //   players.forEach((player)=> {
   //     player.innerHTML = `<p>${player.id}<p>`;
   //   })
-    
+
   //   playerLi.appendChild(players);
   //   playersUl.appendChild(playerLi);
   //   playersDiv.appendChild(playersUl);
   //   rootPlayer.appendChild(playersDiv);
-      
-    
-  // }
-  
 
-  renderCard(item){
-    let player = createElement("div", "player");
-    player.id = item;
-    
-    playerTitle = createElement("p" ,"playerTitle");
-    pleyerTitle.textContent = `player ${player.id}`;
-    
+  // }
+
+  renderCard(item) {
+    const player = createElement("div", "player");
+    player.id = item.id;
+
+    const playerTitle = createElement("p", "playerTitle");
+    playerTitle.textContent = `Player name:  ${item.id}`;
+
+    const total = createElement("p");
+
+    const cardBlock = createElement("div", "playCards");
+
     player.appendChild(playerTitle);
-    
+    player.appendChild(cardBlock);
+
+    const cartinHand = item.card?.map((cart) => {
+      `<div class="card rank-1 ${cart.suits}">
+          <span class="rank" ${cart.value}</span>
+          <span class="suits" ${cart.suits}</span>
+        </div>`;
+    });
+
+    const totalScore = item.card.reduce((acc, elem) => {
+      return (acc = elem.weight);
+    }, 0);
+    cardBlock.innerHTML = cartinHand;
+    total.innerHTML = totalScore;
+    playerTitle.append(total);
+    //fieldContent.appendChild(player);
+    const content = document.querySelector("rootPlayers");
+    content.appendChild(player);
   }
 
-  startGame(){
-    
+  startGame() {
     this.deck.createDeck();
     this.deck.shuffle();
     this.playersInstance.createPlayers(this.deck);
     this.playersInstance.setCard(this.deck.getCart());
     console.log(this.playersInstance.players);
-   
   }
 
-  gameMore(){
+  gameMore() {
     const activePlayer = this.playersInstance.getActivePlayer();
 
     this.playersInstance.setCard(this.deck.getCart());
     this.playersInstance.updetePoints();
     //console.log(this.playersInstance.length);
-    
-    
-      if(activePlayer.points > 21){
-       
-        this.playersInstance.nextPlayer();
-        
-  
-      }
-    
-  
+
+    if (activePlayer.points > 21) {
+      this.playersInstance.nextPlayer();
+    }
+
     //console.log(this.playersInstance.getActivePlayer());
   }
 
-  gameStay(){
+  gameStay() {
     this.playersInstance.nextPlayer();
   }
 }
-
-
-
-
-
 
 const game = new Game();
 
@@ -217,13 +204,4 @@ game.gameMore();
 game.gameStay();
 game.gameMore();
 
-
-
-game.playerRender();
-
-
-
-
-
-
-
+game.renderCard;
